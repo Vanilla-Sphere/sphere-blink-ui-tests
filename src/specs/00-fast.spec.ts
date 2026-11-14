@@ -148,6 +148,12 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
     await page.keyboard.press("Escape");
     await expect(mapScreen.fullScreenButton).toHaveAttribute("aria-pressed", "false");
     await expect(mapScreen.doCards.first()).toBeVisible();
+    // Headless Linux keeps the window fullscreen after Escape; the viewport
+    // can only be resized from the normal state.
+    await page.evaluate(() => {
+      if (document.fullscreenElement) void document.exitFullscreen();
+    });
+    await page.waitForTimeout(200);
 
     // Phone viewport: the card row is a horizontal scroller.
     await page.setViewportSize({ width: 390, height: 720 });
