@@ -80,7 +80,22 @@ export async function openPinnedMover(page: Page, epoch: MoverEpoch): Promise<vo
       body: JSON.stringify({ movers: ids.includes(MOVER_ID) ? [{ ...detail, points: undefined, votes: { real: 1, false: 0 } }] : [], total: 1 }),
     });
   });
-  await page.goto(`${process.env.BASE_URL ?? "https://vanillasphere.com"}/?ui=adv&target=barnard&fov=8&det=6&group=exposure&mover=${MOVER_ID}&seen=${encodeURIComponent(epoch.uid)}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
-  await page.waitForFunction(() => document.getElementById("q") !== null, undefined, { timeout: 60_000 });
-  await page.waitForFunction(() => /1 \/ [1-9]/.test(document.getElementById("count")?.textContent ?? ""), undefined, { timeout: 120_000 });
+  let lastError = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      await page.goto(`${process.env.BASE_URL ?? "https://vanillasphere.com"}/?ui=adv&target=barnard&fov=8&det=6&group=exposure&mover=${MOVER_ID}&seen=${encodeURIComponent(epoch.uid)}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      const shell = await page.evaluate(() => document.getElementById("q") !== null);
+      if (!shell) throw new Error("the app shell is missing");
+      await page.waitForFunction(
+        () => /1 \/ [1-9]/.test(document.getElementById("count")?.textContent ?? ""),
+        undefined,
+        { timeout: 150_000 },
+      );
+      return;
+    } catch (e) {
+      lastError = String(e);
+      await page.waitForTimeout(8_000);
+    }
+  }
+  throw new Error(`could not open the pinned mover view: ${lastError}`);
 }

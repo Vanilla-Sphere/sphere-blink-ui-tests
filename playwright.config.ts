@@ -3,11 +3,12 @@ import { config } from "./src/config.js";
 
 export default defineConfig({
   testDir: "./src/specs",
-  fullyParallel: false,
-  /* One worker: the target runs as a single web process that already asks busy
-     clients to wait (HTTP 429), and view loads repeat across cases and rely on
-     the server cache. Sequential runs keep the load — and the results — steady. */
-  workers: 1,
+  fullyParallel: true,
+  /* Four workers: the instant checks (00-fast) never load data and run fully
+     parallel; the journey is serial and keeps one worker per project, so at
+     most two view loads touch the shared service at once. The app waits out
+     HTTP 429 with the server's Retry-After before it shows an error. */
+  workers: 4,
   /* First loads of a view can take a while: the server cuts the images on demand. */
   timeout: 120_000,
   expect: { timeout: 15_000 },

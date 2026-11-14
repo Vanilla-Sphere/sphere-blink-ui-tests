@@ -26,6 +26,11 @@ export class Analysis {
   readonly zoomOut: Locator;
   readonly zoomReset: Locator;
   readonly verdict: Locator;
+  readonly apiList: Locator;
+  readonly apiSummary: Locator;
+  readonly apiCount: Locator;
+  readonly apiRows: Locator;
+  readonly apiGroups: Locator;
   readonly epochCard: Locator;
   readonly epochInfo: Locator;
   readonly epochFlagChips: Locator;
@@ -70,6 +75,11 @@ export class Analysis {
     this.zoomOut = page.locator("#zoom-out");
     this.zoomReset = page.locator("#zoom-x");
     this.verdict = page.locator("#plotverdict");
+    this.apiList = page.locator("#apilist");
+    this.apiSummary = page.locator("#apilist summary");
+    this.apiCount = page.locator("#apicount");
+    this.apiRows = page.locator("#apirows .share");
+    this.apiGroups = page.locator("#apirows h3");
     this.epochCard = page.locator("#epochcard");
     this.epochInfo = page.locator("#einfo");
     this.epochFlagChips = page.locator("#einfo .flag");
@@ -98,5 +108,21 @@ export class Analysis {
   /** The date of the frame on screen, from the "This frame" card (its first dd). */
   async epochLabel(): Promise<string> {
     return (await this.epochInfo.locator("dd").first().textContent()) ?? "";
+  }
+
+  /** One endpoint row of the API list, picked by its label. Several rows share a
+      label ("Field" twice), so pass an `hrefIncludes` to disambiguate. */
+  apiRow(label: string, hrefIncludes?: string): Locator {
+    let row = this.apiRows.filter({ has: this.page.locator(".lab", { hasText: label }) });
+    if (hrefIncludes) row = row.filter({ has: this.page.locator(`a[href*="${hrefIncludes}"]`) });
+    return row;
+  }
+
+  apiLink(label: string, hrefIncludes?: string): Locator {
+    return this.apiRow(label, hrefIncludes).locator("a.addr");
+  }
+
+  apiCopyButton(label: string, hrefIncludes?: string): Locator {
+    return this.apiRow(label, hrefIncludes).locator("button");
   }
 }

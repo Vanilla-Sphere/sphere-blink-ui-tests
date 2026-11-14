@@ -928,6 +928,126 @@
    "steps": "1. field→mover→exposure→Back→reload/deep link.",
    "expected": "Đúng đối tượng/epoch/band/group; URL không nhầm field.",
    "trace": "delta 0d8474f; features.md §17, viewer"
+  },
+  {
+   "id": "UI-077",
+   "group": "API list",
+   "name": "Bốn nhóm, 21 loại, mở lại không nhân bản",
+   "priority": "P0",
+   "technique": "features.md §15, apilist",
+   "precondition": "View Advanced có vị trí và mover ID (mock)",
+   "testData": "Mở All API endpoints (21)",
+   "steps": "1. Cuộn tới Link or embed. 2. Mở/đóng/mở lại danh sách.",
+   "expected": "Bốn nhóm This view/This position/Moving objects/Service; 21 loại; không nhân bản.",
+   "trace": "delta afd468e; features.md §15, apilist"
+  },
+  {
+   "id": "UI-078",
+   "group": "API list",
+   "name": "Từng nhóm đúng tên/đường dẫn",
+   "priority": "P0",
+   "technique": "features.md §15,17, apilist",
+   "precondition": "Cùng view",
+   "testData": "Đối chiếu từng hàng",
+   "steps": "1. Đối chiếu 21 hàng theo apilist.js.",
+   "expected": "Đúng tên/đường dẫn; không có /api/measure hoặc vote; ghi chú nêu rõ.",
+   "trace": "delta afd468e; features.md §15,17, apilist"
+  },
+  {
+   "id": "UI-079",
+   "group": "API list",
+   "name": "Hàng One ẩn/khiến có ID",
+   "priority": "P1",
+   "technique": "features.md §17, apilist",
+   "precondition": "Fixture movers rỗng rồi có ID",
+   "testData": "Mở danh sách hai lần",
+   "steps": "1. Fixture rỗng: mở danh sách. 2. Fixture có ID: reload, mở lại.",
+   "expected": "One ẩn khi không có ID, các hàng còn lại dùng được; count (21) là số loại; có ID thì One đúng đường dẫn.",
+   "trace": "delta afd468e; features.md §17, apilist"
+  },
+  {
+   "id": "UI-080",
+   "group": "API list",
+   "name": "Mỗi URL mở tab mới đúng href",
+   "priority": "P0",
+   "technique": "features.md §15",
+   "precondition": "Route mock cho endpoint nặng",
+   "testData": "Bấm từng hàng (trừ Cube)",
+   "steps": "1. Bấm lần lượt từng URL. 2. So tab mới với href.",
+   "expected": "Tab mới đúng URL/href, hợp đồng tương ứng; tab gốc giữ view.",
+   "trace": "delta afd468e; features.md §15"
+  },
+  {
+   "id": "UI-081",
+   "group": "API list",
+   "name": "Cube tải đúng định dạng",
+   "priority": "P1",
+   "technique": "features.md §15",
+   "precondition": "Fixture Cube nhỏ",
+   "testData": "Bấm Cube",
+   "steps": "1. Bấm Cube, lưu tệp.",
+   "expected": "Payload binary cube: uint32 độ dài metadata + JSON epochs/grid/encoding.",
+   "trace": "delta afd468e; features.md §15"
+  },
+  {
+   "id": "UI-082",
+   "group": "API list",
+   "name": "Copy đúng URL tuyệt đối",
+   "priority": "P0",
+   "technique": "features.md §15",
+   "precondition": "Target chứa dấu cách/ký tự đặc biệt",
+   "testData": "Copy từng hàng",
+   "steps": "1. Copy từng hàng, đọc clipboard.",
+   "expected": "Clipboard == href tuyệt đối, query đã encode; hai hàng Field kiểm riêng.",
+   "trace": "delta afd468e; features.md §15"
+  },
+  {
+   "id": "UI-083",
+   "group": "API list",
+   "name": "Frame/Epochs/Cube theo det/group/diff",
+   "priority": "P0",
+   "technique": "features.md §15",
+   "precondition": "Đổi band, group, median",
+   "testData": "Đổi rồi so URL",
+   "steps": "1. Đổi D5/D6, Sky pass, median. 2. So query.",
+   "expected": "Frame/Epochs/Cube cập nhật det/group; Frame thêm diff=true; Job/service giữ nguyên; so đã decode.",
+   "trace": "delta afd468e; features.md §15"
+  },
+  {
+   "id": "UI-084",
+   "group": "API list",
+   "name": "Danh sách theo target mới",
+   "priority": "P0",
+   "technique": "features.md §15",
+   "precondition": "Đổi A → B (tên → tọa độ)",
+   "testData": "Mở lại danh sách",
+   "steps": "1. Đổi target/vị trí. 2. Mở danh sách.",
+   "expected": "Endpoint phụ thuộc view/Name/tile/mover field phản ánh B; không còn A; hàng cố định giữ nguyên.",
+   "trace": "delta afd468e; features.md §15"
+  },
+  {
+   "id": "UI-085",
+   "group": "API list",
+   "name": "Simple ẩn danh sách",
+   "priority": "P1",
+   "technique": "features.md §3,15",
+   "precondition": "View Advanced, danh sách mở",
+   "testData": "Chuyển Simple → Advanced",
+   "steps": "1. Chuyển Simple. 2. Quay lại Advanced.",
+   "expected": "Simple không hiển thị/tương tác được danh sách; Advanced trả lại theo view hiện tại.",
+   "trace": "delta afd468e; features.md §3,15"
+  },
+  {
+   "id": "UI-086",
+   "group": "API list",
+   "name": "Bàn phím với danh sách",
+   "priority": "P1",
+   "technique": "features.md §15, viewer",
+   "precondition": "Keyboard; smartphone giả lập",
+   "testData": "Tab, Enter, Copy",
+   "steps": "1. Tab tới control, mở/đóng bằng phím. 2. Copy bằng phím.",
+   "expected": "Focus nhìn thấy, nhãn phân biệt, nội dung không bị che. [C] chuẩn A11y",
+   "trace": "delta afd468e; features.md §15, viewer"
   }
  ]
 }
