@@ -94,7 +94,7 @@ export async function openPinnedMover(page: Page, epoch: MoverEpoch): Promise<vo
       return;
     } catch (e) {
       lastError = String(e);
-      await page.waitForTimeout(8_000);
+      await page.waitForTimeout(15_000);
     }
   }
   throw new Error(`could not open the pinned mover view: ${lastError}`);

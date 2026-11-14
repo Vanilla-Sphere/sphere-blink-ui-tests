@@ -12,7 +12,9 @@ export const BARNARD_ADVANCED = "/?ui=adv&target=barnard&fov=8";
  */
 export async function open(page: Page, path: string): Promise<void> {
   let lastError: unknown = null;
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // Ten attempts with 15 s between them ride out the ~30 s promotion windows
+  // the platform performs several times a day.
+  for (let attempt = 0; attempt < 10; attempt++) {
     try {
       await page.goto(path, { waitUntil: "domcontentloaded", timeout: 60_000 });
       const loaded = await page.evaluate(() => document.getElementById("q") !== null);
@@ -21,7 +23,7 @@ export async function open(page: Page, path: string): Promise<void> {
     } catch (e) {
       lastError = e;
     }
-    await page.waitForTimeout(8_000);
+    await page.waitForTimeout(15_000);
   }
   throw new Error(`could not load ${path}: ${String(lastError)}`);
 }
