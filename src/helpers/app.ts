@@ -12,9 +12,10 @@ export const BARNARD_ADVANCED = "/?ui=adv&target=barnard&fov=8";
  */
 export async function open(page: Page, path: string): Promise<void> {
   let lastError: unknown = null;
-  // Ten attempts with 15 s between them ride out the ~30 s promotion windows
-  // the platform performs several times a day.
-  for (let attempt = 0; attempt < 10; attempt++) {
+  // Sixteen attempts x 30 s: ride out promotion windows, which today can last
+  // several minutes while the web tier flips to the API process (a window on
+  // 2026-11-14 kept serving {"detail":"Not Found"} for over seven minutes).
+  for (let attempt = 0; attempt < 16; attempt++) {
     try {
       await page.goto(path, { waitUntil: "domcontentloaded", timeout: 60_000 });
       const loaded = await page.evaluate(() => document.getElementById("q") !== null);
@@ -23,7 +24,7 @@ export async function open(page: Page, path: string): Promise<void> {
     } catch (e) {
       lastError = e;
     }
-    await page.waitForTimeout(15_000);
+    await page.waitForTimeout(30_000);
   }
   throw new Error(`could not load ${path}: ${String(lastError)}`);
 }

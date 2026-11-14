@@ -181,7 +181,9 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
     await page.route("**/api/atlas/**", (route) => route.abort());
     await mapScreen.zoomHome.click();
     const box = await mapScreen.canvas.boundingBox();
-    await mapScreen.canvas.hover({ position: { x: Math.round((box?.width ?? 390) / 2), y: Math.round((box?.height ?? 500) / 2) } });
+    // Raw mouse move: the canvas repaints while atlas tiles arrive, so the
+    // actionability "stable" check would time out.
+    await page.mouse.move((box?.x ?? 0) + (box?.width ?? 390) / 2, (box?.y ?? 0) + (box?.height ?? 500) / 2);
     if (await page.locator("#mapread").isVisible()) {
       await expect(page.locator("#mapread")).toContainText("°", { timeout: 15_000 });
     }

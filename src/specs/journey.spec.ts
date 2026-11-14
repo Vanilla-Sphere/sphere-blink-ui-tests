@@ -1437,7 +1437,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
     // platform-flaky on headless Linux and was replaced, not weakened into a
     // skip: the end-to-end search below still has to work.
     const mbox = await page.locator("#map").boundingBox();
-    await page.locator("#map").hover({ position: { x: Math.round((mbox?.width ?? 390) / 2), y: Math.round((mbox?.height ?? 500) / 2) } });
+    await page.mouse.move((mbox?.x ?? 0) + (mbox?.width ?? 390) / 2, (mbox?.y ?? 0) + (mbox?.height ?? 500) / 2);
     if (await page.locator("#mapread").isVisible()) {
       await expect(page.locator("#mapread")).toContainText("°", { timeout: 15_000 });
     }
