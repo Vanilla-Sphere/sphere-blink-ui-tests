@@ -1,0 +1,47 @@
+# Runs the suite whenever the suite itself changes, so a broken test is seen
+# here and not first on a merge of the product. The same action (action.yml)
+# is what Vanilla-Sphere/sphere-blink runs after every merge to develop and
+# to main.
+name: ui-tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Site under test
+        type: choice
+        default: https://vanillasphere.com/
+        options:
+          - https://vanillasphere.com/
+          - https://dev.vanillasphere.com/
+      project:
+        description: Project (empty runs both)
+        type: choice
+        default: ""
+        options: ["", desktop, smartphone]
+      grep:
+        description: Only the tests whose title matches, for example UI-00[1-4]
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          base-url: ${{ inputs.base_url || 'https://vanillasphere.com/' }}
+          project: ${{ inputs.project }}
+          grep: ${{ inputs.grep }}
