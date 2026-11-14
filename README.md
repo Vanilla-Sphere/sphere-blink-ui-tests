@@ -2,7 +2,8 @@
 
 Playwright UI test suite for the [Vanilla Sphere](https://vanillasphere.com) viewer
 ([sphere-blink](https://github.com/Vanilla-Sphere/sphere-blink)), generated from a
-manual UI test sheet of 38 Vietnamese cases. TypeScript, Page Object Model, no
+manual UI test sheet of 76 Vietnamese cases (UI-001–UI-038 plus the delta
+UI-039–UI-076). TypeScript, Page Object Model, no
 test framework beyond `@playwright/test`.
 
 Every test title carries its manual case ID (`[UI-013] …`), and every test pushes

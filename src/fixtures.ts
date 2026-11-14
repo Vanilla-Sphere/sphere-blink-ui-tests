@@ -1,6 +1,7 @@
 import { expect, test as base } from "@playwright/test";
 import { AdvancedRail } from "./pages/AdvancedRail.js";
 import { Analysis } from "./pages/Analysis.js";
+import { Extras } from "./pages/Extras.js";
 import { MapScreen } from "./pages/MapScreen.js";
 import { TopBar } from "./pages/TopBar.js";
 import { ViewStage } from "./pages/ViewStage.js";
@@ -11,6 +12,7 @@ export interface Pages {
   viewStage: ViewStage;
   advancedRail: AdvancedRail;
   analysis: Analysis;
+  extras: Extras;
 }
 
 export const test = base.extend<Pages>({
@@ -19,6 +21,7 @@ export const test = base.extend<Pages>({
   viewStage: async ({ page }, use) => use(new ViewStage(page)),
   advancedRail: async ({ page }, use) => use(new AdvancedRail(page)),
   analysis: async ({ page }, use) => use(new Analysis(page)),
+  extras: async ({ page }, use) => use(new Extras(page)),
 });
 
 export { expect };

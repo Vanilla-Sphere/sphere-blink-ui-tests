@@ -44,5 +44,43 @@ carries the case ID; the report annotations carry priority and trace.
 | UI-036 | Mất mạng khi đang tải | P1 | `src/specs/errors-recovery.spec.ts` (desktop: skipped, smartphone: skipped) |
 | UI-037 | Measure this object | P1 | `src/specs/analysis.spec.ts` (desktop: skipped, smartphone: skipped) |
 | UI-038 | Thiết bị chạm thật | P1 | `src/specs/responsive.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-039 | Trang đầu: tâm Ngân Hà, Whole sky, sáu thẻ | P0 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-040 | Thẻ mở đúng mục tiêu/chế độ | P1 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-041 | Thẻ mở Discoveries/Redshift/About | P1 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-042 | Thẻ: zoom, full screen, mobile | P1 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-043 | Star snapping và Alt-click | P1 | `src/specs/features-cards.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-044 | Ảnh nền 2MASS và atlas lỗi | P1 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-045 | Reduced motion trên bản đồ | P1 | `src/specs/features-cards.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-046 | Zoom ảnh và reset | P1 | `src/specs/image-zoom-flagged.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-047 | Show/Hide flagged | P0 | `src/specs/image-zoom-flagged.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-048 | Chỉ có điểm flagged vẫn hiển thị | P1 | `src/specs/image-zoom-flagged.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-049 | Phân biệt cờ lõi sáng và cờ lỗi | P1 | `src/specs/image-zoom-flagged.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-050 | Nhóm ngày Over time | P1 | `src/specs/overtime-reading.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-051 | Nhóm phóng giữ flagged/thang | P1 | `src/specs/overtime-reading.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-052 | Câu Over time theo trạng thái | P1 | `src/specs/overtime-reading.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-053 | Preliminary reading | P1 | `src/specs/overtime-reading.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-054 | Reference wavelengths | P1 | `src/specs/overtime-reading.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-055 | Reading theo target mới | P1 | `src/specs/overtime-reading.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-056 | Xuất CSV và PNG phổ | P1 | `src/specs/overtime-reading.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-057 | Source files | P1 | `src/specs/files-depth.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-058 | Distance and redshift | P1 | `src/specs/files-depth.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-059 | Lookup không đáp ứng | P1 | `src/specs/files-depth.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-060 | From its lines cho quasar | P1 | `src/specs/files-depth.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-061 | Không gán z từ một vạch | P1 | `src/specs/files-depth.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-062 | Bộ lọc redshift Off/All/ngưỡng | P1 | `src/specs/compare-redshift.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-063 | Hover/click đối tượng redshift | P1 | `src/specs/compare-redshift.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-064 | Compare spectra tới 6 object | P1 | `src/specs/compare-redshift.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-065 | Compare: trục, thang, z, Reset | P1 | `src/specs/compare-redshift.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-066 | Discoveries All/Fast/Slow/Following | P1 | `src/specs/movers-discoveries.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-067 | Frame mover: URL mover/seen | P0 | `src/specs/movers-discoveries.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-068 | Back to field và fallback | P0 | `src/specs/movers-discoveries.spec.ts` (desktop: skipped, smartphone: skipped) |
+| UI-069 | Overlay mover: path, ring, band | P1 | `src/specs/movers-discoveries.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-070 | Vote Real motion / False alarm | P1 | `src/specs/movers-discoveries.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-071 | Follow qua reload | P1 | `src/specs/movers-discoveries.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-072 | Measured: hướng và giới hạn | P1 | `src/specs/tracks-info.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-073 | Biểu đồ motion | P2 | `src/specs/tracks-info.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-074 | Biên 480/760 cho phần mới | P1 | `src/specs/responsive-extras.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-075 | Đổi target khi mạng chậm | P1 | `src/specs/responsive-extras.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-076 | Chuỗi field→mover→exposure→Back | P1 | `src/specs/responsive-extras.spec.ts` (desktop: passed, smartphone: passed) |
 
-Run outcomes across both projects: {"passed":66,"skipped":10}
+Run outcomes across both projects: {"passed":124,"skipped":28}
