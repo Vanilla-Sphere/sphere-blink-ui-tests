@@ -1,0 +1,115 @@
+# The CI entry point of this repository: one step that installs the suite,
+# runs it against a deployed Vanilla Sphere site and reports what happened.
+#
+# Used in two places:
+#   * here, by .github/workflows/ui-tests.yml (every push and pull request);
+#   * in Vanilla-Sphere/sphere-blink, after every merge to develop (the dev
+#     site) and to main (production):
+#         - uses: Vanilla-Sphere/sphere-blink-ui-tests@main
+#           with:
+#             base-url: https://dev.vanillasphere.com/
+#     The run then appears as a check on the sphere-blink commit, while the
+#     tests and how they are run stay here.
+#
+# Another repository of the organisation may use this action only while
+# Settings > Actions > General > Access of this repository says "Accessible
+# from repositories in the 'Vanilla-Sphere' organization".
+#
+# The cases that start heavy jobs or write measurements (UI-025, UI-026,
+# UI-037) are never enabled here: both dev and production are served by the
+# production engine.
+name: Vanilla Sphere UI tests
+description: Run the Playwright UI suite of this repository against a deployed Vanilla Sphere site.
+
+inputs:
+  base-url:
+    description: Address of the site under test.
+    required: false
+    default: https://vanillasphere.com/
+  project:
+    description: Playwright project to run, "desktop" or "smartphone". Empty runs both.
+    required: false
+    default: ""
+  grep:
+    description: Run only the tests whose title matches this pattern, for example "UI-00[1-4]". Empty runs all.
+    required: false
+    default: ""
+  report-name:
+    description: Name of the uploaded artifact that holds the HTML report, the JSON results and the traces of failed tests.
+    required: false
+    default: ui-tests-report
+
+outputs:
+  passed:
+    description: Number of tests that passed.
+    value: ${{ steps.summary.outputs.passed }}
+  failed:
+    description: Number of tests that failed.
+    value: ${{ steps.summary.outputs.failed }}
+  skipped:
+    description: Number of tests that were skipped.
+    value: ${{ steps.summary.outputs.skipped }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Install the suite
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci
+
+    - name: Install Chromium
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npx playwright install --with-deps chromium
+
+    - name: Run the UI tests
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        BASE_URL: ${{ inputs.base-url }}
+        UI_PROJECT: ${{ inputs.project }}
+        UI_GREP: ${{ inputs.grep }}
+        # Never in CI: these two enable the cases that start heavy jobs and
+        # write measurements on the engine of production.
+        TEST_ALLOW_HEAVY_JOBS: ""
+        TEST_ALLOW_MEASURE: ""
+      run: |
+        args=()
+        if [ -n "$UI_PROJECT" ]; then args+=("--project=$UI_PROJECT"); fi
+        if [ -n "$UI_GREP" ]; then args+=("--grep" "$UI_GREP"); fi
+        echo "Site under test: $BASE_URL"
+        npx playwright test "${args[@]}"
+
+    - name: Summary
+      id: summary
+      if: ${{ !cancelled() }}
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        BASE_URL: ${{ inputs.base-url }}
+      run: node scripts/ci-summary.mjs
+
+    - name: Collect the report
+      if: ${{ !cancelled() }}
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        REPORT_DIR: ${{ runner.temp }}/ui-tests-report
+      run: |
+        rm -rf "$REPORT_DIR" && mkdir -p "$REPORT_DIR"
+        for item in playwright-report test-results; do
+          if [ -e "$item" ]; then cp -R "$item" "$REPORT_DIR/"; fi
+        done
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: ${{ inputs.report-name }}
+        path: ${{ runner.temp }}/ui-tests-report
+        if-no-files-found: warn
+        retention-days: 14
