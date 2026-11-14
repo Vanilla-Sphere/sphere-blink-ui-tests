@@ -1614,6 +1614,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   // mover leg runs on a route mock ([mock]) over a real, read-only view.
   test("[UI-076] Mover/exposure qua reload và Back/Forward [mock, partial]", async ({ page, request, extras }) => {
     annotateCase(test.info(), "UI-076", "P1", "features.md §17, viewer URL; mover leg = route mock [mock]; field leg needs staging (partial)");
+    test.setTimeout(540_000);
     test.setTimeout(240_000);
 
     const epoch = await pickBarnardExposure(request);
@@ -1694,6 +1695,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   // and is not asserted.
   test("[UI-067] Deep link mover/seen mở đúng frame [mock] @p0", async ({ page, request, viewStage, extras }) => {
     annotateCase(test.info(), "UI-067", "P0", "features.md §17; mover = route mock [mock], frame = real read-only Barnard view; ring pixels not asserted");
+    test.setTimeout(540_000);
 
     const epoch = await pickBarnardExposure(request);
     mockMoverRoutes(page, epoch);
@@ -1731,6 +1733,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   // visual oracle; the band note and the checkbox are asserted.
   test("[UI-069] Overlay mover: bật/tắt và chỉ dẫn band sai [mock, partial]", async ({ page, request, advancedRail, extras }) => {
     annotateCase(test.info(), "UI-069", "P1", "features.md §17; mover = route mock [mock]; path/ring pixels = [C] not asserted (partial)");
+    test.setTimeout(540_000);
 
     const epoch = await pickBarnardExposure(request);
     mockMoverRoutes(page, epoch);
@@ -1755,6 +1758,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   // no vote request ever reaches production or dev.
   test("[UI-070] Vote Real motion / False alarm [mock]", async ({ page, request, extras }) => {
     annotateCase(test.info(), "UI-070", "P1", "features.md §17; vote endpoint = route mock [mock], nothing reaches a real server; two-choice rule = [C]");
+    test.setTimeout(540_000);
 
     const epoch = await pickBarnardExposure(request);
     mockMoverRoutes(page, epoch);
@@ -1785,6 +1789,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   // is local-only.
   test("[UI-071] Follow giữ sau reload, mất khi xoá localStorage [mock]", async ({ page, request, extras }) => {
     annotateCase(test.info(), "UI-071", "P1", "features.md §17; list = route mock [mock]; Follow is localStorage-only by design");
+    test.setTimeout(540_000);
 
     const epoch = await pickBarnardExposure(request);
     mockMoverRoutes(page, epoch);

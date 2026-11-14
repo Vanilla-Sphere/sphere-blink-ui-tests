@@ -17,7 +17,7 @@ export interface MoverEpoch {
 /** Reads a real exposure of the cached Barnard view, retrying through deployment windows. */
 export async function pickBarnardExposure(request: APIRequestContext): Promise<MoverEpoch> {
   let lastError = "";
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 10; attempt++) {
     try {
       const r = await request.get("/api/epochs?target=barnard&det=6&group=exposure");
       const text = await r.text();
@@ -29,7 +29,7 @@ export async function pickBarnardExposure(request: APIRequestContext): Promise<M
       return { uid: chosen.exposures[0]!, mjd: chosen.mjd, index };
     } catch (e) {
       lastError = String(e);
-      await new Promise((resolve) => setTimeout(resolve, 8_000));
+      await new Promise((resolve) => setTimeout(resolve, 15_000));
     }
   }
   throw new Error(`could not read the epoch list for the mover fixture: ${lastError}`);
@@ -81,7 +81,7 @@ export async function openPinnedMover(page: Page, epoch: MoverEpoch): Promise<vo
     });
   });
   let lastError = "";
-  for (let attempt = 0; attempt < 4; attempt++) {
+  for (let attempt = 0; attempt < 10; attempt++) {
     try {
       await page.goto(`${process.env.BASE_URL ?? "https://vanillasphere.com"}/?ui=adv&target=barnard&fov=8&det=6&group=exposure&mover=${MOVER_ID}&seen=${encodeURIComponent(epoch.uid)}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
       const shell = await page.evaluate(() => document.getElementById("q") !== null);

@@ -93,4 +93,4 @@ carries the case ID; the report annotations carry priority and trace.
 | UI-085 | Simple ẩn danh sách | P1 | `src/specs/api-list.spec.ts` (desktop: passed, smartphone: passed) |
 | UI-086 | Bàn phím với danh sách | P1 | `src/specs/api-list.spec.ts` (desktop: passed, smartphone: passed) |
 
-Run outcomes across both projects: {"passed":144,"skipped":28}
+Run outcomes across both projects: {"passed":158,"skipped":30}
