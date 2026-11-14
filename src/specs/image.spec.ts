@@ -5,8 +5,9 @@ import { expect, test } from "../fixtures.js";
 
 const HEAVY_JOBS_REASON =
   "Progressive fields start cell-cutting jobs on the server (UI precondition: an environment " +
-  "where creating jobs is approved). They stay skipped on production; set TEST_ALLOW_HEAVY_JOBS=1 " +
-  "with BASE_URL pointing at an approved staging service to run them.";
+  "where creating jobs is approved). Production and dev.vanillasphere.com share the production " +
+  "backend, so the guard covers both; set TEST_ALLOW_HEAVY_JOBS=1 with BASE_URL pointing at an " +
+  "approved isolated staging service to run them.";
 
 test.describe("Bands, grouping and image math (manual cases UI-020 .. UI-026)", () => {
   // UI-020 · P0 · features.md §5
@@ -153,7 +154,7 @@ test.describe("Bands, grouping and image math (manual cases UI-020 .. UI-026)", 
   // stage when done, with the cell grid overlay.
   test("[UI-025] Chuyển tiến trình 3×3", async ({ page, topBar, viewStage, advancedRail }) => {
     annotateCase(test.info(), "UI-025", "P1", "features.md §8");
-    test.skip(config.isProduction && !config.allowHeavyJobs, HEAVY_JOBS_REASON);
+    test.skip(config.sharedBackend && !config.allowHeavyJobs, HEAVY_JOBS_REASON);
     test.setTimeout(420_000);
 
     await open(page, BARNARD_ADVANCED);
@@ -175,7 +176,7 @@ test.describe("Bands, grouping and image math (manual cases UI-020 .. UI-026)", 
   // plain 8 arcmin view at full detail.
   test("[UI-026] Drill-down 7×7", async ({ page, topBar, viewStage }) => {
     annotateCase(test.info(), "UI-026", "P1", "features.md §8");
-    test.skip(config.isProduction && !config.allowHeavyJobs, HEAVY_JOBS_REASON);
+    test.skip(config.sharedBackend && !config.allowHeavyJobs, HEAVY_JOBS_REASON);
     test.setTimeout(900_000);
 
     await open(page, BARNARD_ADVANCED);

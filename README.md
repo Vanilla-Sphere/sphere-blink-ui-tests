@@ -73,15 +73,24 @@ Design notes:
 - **Isolation**: every test gets a fresh browser context (fresh `localStorage`),
   so mode-storage cases set their state explicitly.
 
-Target-version note: the suite runs against the **live deployment**
-(static assets `?v=21`), which is newer than the design docs snapshot in the
-sphere-blink clone (commit `245327b`, assets `?v=16`). Oracles were verified
-against the live client: the local "off the sky" rejection for out-of-range
-coordinates (`err.range`), the client that waits out HTTP 429/503 with
-`Retry-After` before showing an error, the frame chips listing only the
-detectors that observed the target that day, and the map zoom that keeps the
-sky point under the pointer (so zooming back out leaves the centre slightly
-off — no exact-pixel return is asserted).
+Target-version note: the suite runs against the **live deployment**, last
+verified at static assets `?v=50`, matching sphere-blink commit `0d8474f`
+(the delta design of 2026-11-14; previously `245327b` / `?v=16`). Oracles were
+verified against the live client, among them: the local "off the sky"
+rejection for out-of-range coordinates (`err.range`), the client that waits
+out HTTP 429/503 with `Retry-After` before showing an error, the frame chips
+listing only the detectors that observed the target that day, the map zoom
+that keeps the sky point under the pointer (so zooming back out leaves the
+centre slightly off — no exact-pixel return is asserted), the start screen
+centred near the galactic centre with six feature cards, and the plot's
+"Over time" rename (button label; title "Flux over time at the crosshair").
+
+Environment guard: **dev.vanillasphere.com shares the production backend**
+(docs/environments.md), so the shared-backend guard covers production, www and
+dev: cases that write data (UI-037 Measure) or start heavy server jobs
+(UI-025/UI-026 progressive fields, which may trigger a blind search) stay
+skipped on all of them unless `BASE_URL` points at an approved isolated
+staging service and the matching `TEST_ALLOW_*` flag is set.
 
 ## Scope and honest limitations
 

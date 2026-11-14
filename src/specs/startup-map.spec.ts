@@ -3,11 +3,14 @@ import { open, screen, uiMode, urlParams } from "../helpers/app.js";
 import { expect, test } from "../fixtures.js";
 
 test.describe("Startup and sky map (manual cases UI-001 .. UI-004)", () => {
-  // UI-001 · P0 · features.md §1,3
-  // Precondition: fresh session without vs.ui. Expected: whole-sky map with the
-  // suggested targets, Simple mode selected.
+  // UI-001 · P0 · features.md §1,3 (delta 0d8474f)
+  // Precondition: fresh session without vs.ui. Expected: the map opens centred
+  // near the galactic centre (starmap.js OPEN view, RA 266.4 Dec -29 — asserted
+  // as "the map is drawn", not pixel-checked), the six feature cards are listed
+  // with their destinations, the suggested targets are there, Simple is selected.
+  // "Whole sky" returning to the full sky is UI-002.
   test("[UI-001] Trang chủ lần đầu", async ({ page, mapScreen }) => {
-    annotateCase(test.info(), "UI-001", "P0", "features.md §1,3");
+    annotateCase(test.info(), "UI-001", "P0", "features.md §1,3; delta 0d8474f: start near the galactic centre, six feature cards, Whole sky resets");
 
     await open(page, "/");
 
@@ -15,7 +18,10 @@ test.describe("Startup and sky map (manual cases UI-001 .. UI-004)", () => {
     expect(await screen(page)).toBe("map");
     await expect(page).toHaveTitle(/Vanilla Sphere/);
     await expect(mapScreen.featuredTargets).toHaveCount(5);
-    expect(await mapScreen.checksum()).toBeGreaterThan(0);
+    await expect(mapScreen.doCards).toHaveCount(6);
+    await expect(page.locator("#dolist .do .nm").first()).not.toBeEmpty();
+    await expect(page.locator("#atlasnote")).toBeVisible();
+    expect(await mapScreen.settledChecksum()).toBeGreaterThan(10_000);
   });
 
   // UI-002 · P1 · features.md §1
@@ -27,7 +33,7 @@ test.describe("Startup and sky map (manual cases UI-001 .. UI-004)", () => {
     annotateCase(test.info(), "UI-002", "P1", "features.md §1; zoom-about-pointer leaves the centre slightly off, no exact-return assertion");
 
     await open(page, "/");
-    const whole = await mapScreen.checksum();
+    const whole = await mapScreen.settledChecksum();
 
     await mapScreen.zoomIn.click();
     const zoomed = await mapScreen.checksum();
@@ -54,7 +60,7 @@ test.describe("Startup and sky map (manual cases UI-001 .. UI-004)", () => {
     test.setTimeout(180_000);
 
     await open(page, "/");
-    const mapBefore = await mapScreen.checksum();
+    const mapBefore = await mapScreen.settledChecksum();
 
     await mapScreen.clickAt(0.5, 0.45);
     await expect
@@ -77,7 +83,7 @@ test.describe("Startup and sky map (manual cases UI-001 .. UI-004)", () => {
     test.setTimeout(180_000);
 
     await open(page, "/");
-    const whole = await mapScreen.checksum();
+    const whole = await mapScreen.settledChecksum();
 
     await mapScreen.canvas.focus();
     await page.keyboard.press("ArrowRight");

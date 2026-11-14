@@ -44,8 +44,10 @@ test.describe("Navigation and URL state (manual cases UI-030, UI-031)", () => {
   // Expected: opening B while A is still loading leaves the last view as B;
   // title, URL and frames never fall back to A. Barnard's view request is held
   // back by six seconds (client-side route delay) to make the overlap deterministic.
+  // Delta 0d8474f: the URL gained `mover`/`seen` and field-return state; those
+  // navigation flows are cases UI-067/UI-076 (later round).
   test("[UI-031] Phản hồi cũ không ghi đè", async ({ page, topBar, viewStage }) => {
-    annotateCase(test.info(), "UI-031", "P1", "viewer.md §Loading a view; simulated slow network via route delay");
+    annotateCase(test.info(), "UI-031", "P1", "viewer.md §Loading a view; delta 0d8474f: mover/seen URL flows = UI-067/076; simulated slow network via route delay");
     test.setTimeout(180_000);
 
     await page.route("**/api/view?*target=barnard*", async (route) => {

@@ -1,5 +1,5 @@
 import { type Locator, type Page } from "@playwright/test";
-import { stableCanvasChecksum } from "../helpers/app.js";
+import { awaitMapSettled, stableCanvasChecksum } from "../helpers/app.js";
 
 /** The whole-sky map screen: canvas, zoom buttons, challenge-target list. */
 export class MapScreen {
@@ -10,6 +10,7 @@ export class MapScreen {
   readonly zoomOut: Locator;
   readonly zoomHome: Locator;
   readonly featuredTargets: Locator;
+  readonly doCards: Locator;
   readonly pointerReadout: Locator;
 
   constructor(page: Page) {
@@ -20,6 +21,7 @@ export class MapScreen {
     this.zoomOut = page.locator("#map-out");
     this.zoomHome = page.locator("#map-home");
     this.featuredTargets = page.locator("#mapfeatured .target");
+    this.doCards = page.locator("#dolist .do");
     this.pointerReadout = page.locator("#mapread");
   }
 
@@ -34,6 +36,11 @@ export class MapScreen {
 
   async checksum(): Promise<number> {
     return stableCanvasChecksum(this.page, "#map");
+  }
+
+  /** Waits out the first full paint, including the async 2MASS atlas backdrop. */
+  async settledChecksum(): Promise<number> {
+    return awaitMapSettled(this.page, "#map");
   }
 
   /** Opens a challenge target from the list under the map ("Start here"). */

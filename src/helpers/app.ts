@@ -48,7 +48,9 @@ export async function canvasChecksum(page: Page, selector: string): Promise<numb
     if (!ctx) return -1;
     const data = ctx.getImageData(0, 0, cv.width, cv.height).data;
     let sum = 0;
-    for (let i = 0; i < data.length; i += 389 * 4) sum += data[i]! + data[i + 1]! + data[i + 2]!;
+    // every pixel: small drawn marks (the crosshair on a phone-size canvas)
+    // must not slip between samples
+    for (let i = 0; i < data.length; i += 4) sum += data[i]! + data[i + 1]! + data[i + 2]!;
     return sum;
   }, selector);
 }
@@ -61,6 +63,23 @@ export async function stableCanvasChecksum(page: Page, selector: string, tries =
     if (value === previous && value > 0) return value;
     previous = value;
     await page.waitForTimeout(250);
+  }
+  return previous;
+}
+
+/**
+ * Waits until the sky map has finished its first full paint. Since the 2MASS
+ * atlas backdrop (added with the v50 viewer) tiles in asynchronously, a single
+ * stable read can latch onto an intermediate state; this requires the same
+ * settled value across several reads spread over about two seconds.
+ */
+export async function awaitMapSettled(page: Page, selector = "#map"): Promise<number> {
+  let previous = await stableCanvasChecksum(page, selector);
+  for (let i = 0; i < 10; i++) {
+    await page.waitForTimeout(600);
+    const next = await stableCanvasChecksum(page, selector);
+    if (next === previous && next > 10_000) return next;
+    previous = next;
   }
   return previous;
 }

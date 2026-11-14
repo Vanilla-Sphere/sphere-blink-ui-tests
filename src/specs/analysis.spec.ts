@@ -5,15 +5,19 @@ import { expect, test } from "../fixtures.js";
 
 const MEASURE_REASON =
   '"Measure this object" starts a measurement job and stores its rows on the server. ' +
-  "Per the agreed rule it is not run against production (https://vanillasphere.com). " +
-  "Point BASE_URL at an isolated staging service and set TEST_ALLOW_MEASURE=1 to enable it.";
+  "Per the agreed rule it is not run against a shared backend: production and " +
+  "dev.vanillasphere.com both use it (docs/environments.md). Point BASE_URL at an isolated " +
+  "staging service and set TEST_ALLOW_MEASURE=1 to enable it.";
 
 test.describe("Analysis panels (manual cases UI-028, UI-029, UI-037)", () => {
-  // UI-028 · P1 · features.md §9
-  // Expected: the plot switches between spectrum and light curve; title, legend
-  // and units follow the selection.
-  test("[UI-028] Spectrum và light curve", async ({ page, analysis }) => {
-    annotateCase(test.info(), "UI-028", "P1", "features.md §9");
+  // UI-028 · P1 · features.md §9 (delta 0d8474f)
+  // Expected: the plot switches between Spectrum and Over time; title, legend
+  // and units follow the selection. The delta renamed "Light curve" to
+  // "Over time" and added day groups, the flagged toggle, the preliminary
+  // reading and the CSV/PNG exports; their full flows are cases UI-047..UI-056
+  // (later round), so here the presence and labels are asserted only.
+  test("[UI-028] Spectrum và Over time", async ({ page, analysis }) => {
+    annotateCase(test.info(), "UI-028", "P1", "features.md §9; delta 0d8474f: Over time, day groups, flagged toggle, reading, exports — presence only (full flows = UI-047..056)");
 
     await open(page, BARNARD_ADVANCED);
     await waitViewReady(page);
@@ -21,11 +25,15 @@ test.describe("Analysis panels (manual cases UI-028, UI-029, UI-037)", () => {
 
     await expect(analysis.spectrumTitle).toHaveText("Spectrum at the crosshair");
     await expect(analysis.spectrumLegend).toContainText("pass");
+    await expect(analysis.spectrumModeButtons.locator('button[data-v="lc"]')).toHaveText("Over time");
 
     await analysis.choosePlot("lc");
-    await expect(analysis.spectrumTitle).toHaveText("Light curve at the crosshair");
+    await expect(analysis.spectrumTitle).toHaveText("Flux over time at the crosshair");
     await expect(analysis.spectrumLegend).toContainText("D1");
     await expect(analysis.spectrumLegend).toContainText("D6");
+    // Barnard spans several sky passes, so the day-group navigation appears.
+    await expect(analysis.overTimeNav).toBeVisible();
+    await expect(analysis.overTimeNav).toContainText("group");
 
     await analysis.choosePlot("spec");
     await expect(analysis.spectrumTitle).toHaveText("Spectrum at the crosshair");
@@ -35,9 +43,12 @@ test.describe("Analysis panels (manual cases UI-028, UI-029, UI-037)", () => {
   // UI-029 · P1 · features.md §14 (EX-03)
   // Expected: "This frame" shows UTC date, detectors, exposure count, coverage
   // and the quality flags at the target; saturation warnings where present.
+  // Delta 0d8474f: bright-core flags (OVERFLOW, TRANSIENT, SUR_ERROR, BLOOM)
+  // are presentation-only in the plot; this case still checks the card's
+  // provenance display, not the plot's point selection (UI-049 later round).
   // Data-dependent: skips when no flagged frame appears in the first frames.
   test("[UI-029] This frame và saturation", async ({ page, viewStage, analysis }) => {
-    annotateCase(test.info(), "UI-029", "P1", "features.md §14");
+    annotateCase(test.info(), "UI-029", "P1", "features.md §14; delta 0d8474f: bright-core flags are not plot exclusions (point selection = UI-049)");
 
     await open(page, BARNARD_ADVANCED);
     await waitViewReady(page);
@@ -64,7 +75,7 @@ test.describe("Analysis panels (manual cases UI-028, UI-029, UI-037)", () => {
   // progress and then the result. Never run against production: it writes data.
   test("[UI-037] Measure this object (chỉ staging được phép)", async ({ page, topBar, analysis }) => {
     annotateCase(test.info(), "UI-037", "P1", "features.md §12");
-    test.skip(!config.allowMeasure, MEASURE_REASON);
+    test.skip(config.sharedBackend || !config.allowMeasure, MEASURE_REASON);
     test.setTimeout(480_000);
 
     // An unmeasured position, so the measure row is offered.

@@ -3,15 +3,20 @@ import { BARNARD_ADVANCED, open, waitViewReady } from "../helpers/app.js";
 import { expect, test } from "../fixtures.js";
 
 test.describe("Sharing (manual case UI-032)", () => {
-  // UI-032 · P2 · features.md §15
+  // UI-032 · P2 · features.md §15 (delta 0d8474f)
   // Expected: the Page/GIF/Data links point at the current view and its
-  // resources. The GIF and data endpoints are NOT opened here: fetching them
-  // starts render jobs on the shared server (see the README limitations).
+  // resources; the spectrum panel offers CSV and PNG exports. The GIF/data
+  // endpoints are NOT fetched here and the export downloads are not exercised:
+  // they start render jobs / downloads whose content check is UI-056 (later
+  // round) — this case is partially covered by design.
   test("[UI-032] Liên kết GIF, Page, Data", async ({ page, analysis }) => {
-    annotateCase(test.info(), "UI-032", "P2", "features.md §15; link targets checked, not fetched");
+    annotateCase(test.info(), "UI-032", "P2", "features.md §15; delta 0d8474f: CSV/PNG exports present, download flow = UI-056 (partial)");
 
     await open(page, BARNARD_ADVANCED);
     await waitViewReady(page);
+    await expect(analysis.spectrumCard).toBeVisible({ timeout: 120_000 });
+    await expect(analysis.csvButton).toBeVisible();
+    await expect(analysis.pngButton).toBeVisible();
 
     const pageUrl = new URL(await analysis.pageLinkInput.inputValue());
     expect(pageUrl.origin).toBe("https://vanillasphere.com");
