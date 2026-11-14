@@ -222,7 +222,8 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
     await page.keyboard.press("Escape");
     await expect(page.locator("nav.barlinks .tip.open")).toHaveCount(0);
     await page.mouse.move(8, 8);
-    await page.waitForTimeout(200);
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    await page.waitForTimeout(600);
     expect(await page.evaluate(() => getComputedStyle(document.querySelector("nav.barlinks .tipbody")!).visibility)).toBe("hidden");
 
     // Icon buttons carry accessible names.
