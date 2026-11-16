@@ -1,15 +1,17 @@
 # The CI entry point of this repository: one step that installs the suite,
 # runs it against a deployed Vanilla Sphere site and reports what happened.
 #
-# Used in two places:
+# Used in two places, both against the service of sphere-blink started
+# inside the job, never against a deployed site (the team's rule since
+# 2026-11-16: no test traffic to production or any site on Render):
 #   * here, by .github/workflows/ui-tests.yml (every push and pull request);
-#   * in Vanilla-Sphere/sphere-blink, after every merge to develop (the dev
-#     site) and to main (production):
+#   * in Vanilla-Sphere/sphere-blink, on every pull request to develop and
+#     main (before the merge):
 #         - uses: Vanilla-Sphere/sphere-blink-ui-tests@main
 #           with:
-#             base-url: https://dev.vanillasphere.com/
-#     The run then appears as a check on the sphere-blink commit, while the
-#     tests and how they are run stay here.
+#             base-url: https://vanillasphere.com/   # this machine, there
+#     The run then appears as a check on the sphere-blink pull request,
+#     while the tests and how they are run stay here.
 #
 # Another repository of the organisation may use this action only while
 # Settings > Actions > General > Access of this repository says "Accessible
@@ -19,13 +21,12 @@
 # UI-037) are never enabled here: both dev and production are served by the
 # production engine.
 name: Vanilla Sphere UI tests
-description: Run the Playwright UI suite of this repository against a deployed Vanilla Sphere site.
+description: Run the Playwright UI suite of this repository against a Vanilla Sphere service started in the calling job.
 
 inputs:
   base-url:
-    description: Address of the site under test.
-    required: false
-    default: https://vanillasphere.com/
+    description: Address of the site under test. Required, with no default, so that no caller reaches production by leaving it out; the caller must make that address lead to a server started in its own job.
+    required: true
   project:
     description: Playwright project to run, "desktop" or "smartphone". Empty runs both.
     required: false

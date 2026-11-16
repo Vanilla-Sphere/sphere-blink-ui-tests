@@ -1,7 +1,14 @@
 # Runs the suite whenever the suite itself changes, so a broken test is seen
-# here and not first on a merge of the product. The same action (action.yml)
-# is what Vanilla-Sphere/sphere-blink runs after every merge to develop and
-# to main.
+# here and not first on a pull request of the product.
+#
+# Rule of the team (2026-11-16): tests never run against production or any
+# site hosted on Render (vanillasphere.com, dev.vanillasphere.com, the
+# onrender.com names). Every byte those sites send is billed, and one run
+# opens hundreds of pages and downloads about a third of a gigabyte. So this
+# job does what Vanilla-Sphere/sphere-blink does before a merge: it starts
+# the service of sphere-blink (branch develop) inside the job, and every name
+# of the deployed sites resolves to this machine. A test that names a
+# deployed site reaches that server or fails; nothing reaches Render.
 name: ui-tests
 
 on:
@@ -10,13 +17,10 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      base_url:
-        description: Site under test
-        type: choice
-        default: https://vanillasphere.com/
-        options:
-          - https://vanillasphere.com/
-          - https://dev.vanillasphere.com/
+      product_ref:
+        description: Branch of sphere-blink whose service is tested
+        type: string
+        default: develop
       project:
         description: Project (empty runs both)
         type: choice
@@ -37,11 +41,89 @@ concurrency:
 jobs:
   ui-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
+    env:
+      # The address of production, which in this job is this machine (see
+      # the hosts step below)
+      SITE: https://vanillasphere.com
     steps:
       - uses: actions/checkout@v4
+
+      - name: The service under test (sphere-blink)
+        uses: actions/checkout@v4
+        with:
+          repository: Vanilla-Sphere/sphere-blink
+          ref: ${{ inputs.product_ref || 'develop' }}
+          path: site
+
+      - name: Python of the service
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: site/requirements.txt
+
+      - name: Packages of the service
+        run: |
+          pip install -r site/requirements.txt
+          # certutil: the browser of the tests has to trust the certificate
+          # of the site started below
+          command -v certutil >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q libnss3-tools; }
+
+      - name: Frames and tiles of earlier runs
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/sphereblink-cache
+          key: ui-tests-site-cache-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ui-tests-site-cache-v1-
+
+      # From here on every name of the deployed sites is this machine, for
+      # every program of the job. Ports from 443 up may be opened without
+      # being root.
+      - name: The names of the deployed sites point at this job
+        run: |
+          names="vanillasphere.com www.vanillasphere.com dev.vanillasphere.com sphere-blink-bsfz.onrender.com sphere-blink-dev-atkl.onrender.com"
+          echo "127.0.0.1 $names" | sudo tee -a /etc/hosts >/dev/null
+          sudo sysctl -q -w net.ipv4.ip_unprivileged_port_start=443
+          for n in $names; do
+            test "$(getent hosts "$n" | awk '{print $1}')" = 127.0.0.1 || { echo "::error::$n does not lead to this machine"; exit 1; }
+          done
+
+      - name: Start the service in this job
+        env:
+          SPHEREX_CACHE_DIR: ${{ runner.temp }}/sphereblink-cache
+          SPHEREX_DISK_BUDGET_GB: "2"
+          SITE_HTTPS: "1"
+          SITE_NAME: vanillasphere.com
+          PORT: "443"
+          SITE_CERTS: ${{ runner.temp }}/local-site-certs
+          SITE_LOG: ${{ runner.temp }}/local-site.log
+          SITE_PID: ${{ runner.temp }}/local-site.pid
+        run: |
+          sh site/scripts/start_local_site.sh
+          echo "NODE_EXTRA_CA_CERTS=$SITE_CERTS/ca.pem" >> "$GITHUB_ENV"
+          here=$(curl -fsS -m 20 --cacert "$SITE_CERTS/ca.pem" "$SITE/api/health")
+          if ! echo "$here" | grep -Eq "\"instance\" *: *\"$(cat "$SITE_PID")-"; then
+            echo "::error title=Not the site of this job::$SITE does not lead to the server started in this job."
+            exit 1
+          fi
+          echo "**$SITE in this run is the server started inside the job** from sphere-blink \`$(git -C site rev-parse --short=12 HEAD)\`. Nothing was asked of the deployed sites." >> "$GITHUB_STEP_SUMMARY"
+
       - uses: ./
         with:
-          base-url: ${{ inputs.base_url || 'https://vanillasphere.com/' }}
+          base-url: ${{ env.SITE }}/
           project: ${{ inputs.project }}
           grep: ${{ inputs.grep }}
+
+      - name: Stop the service
+        if: always()
+        env:
+          SITE_PID: ${{ runner.temp }}/local-site.pid
+        run: sh site/scripts/start_local_site.sh stop
+
+      - name: Keep the frames and tiles for the next run
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/sphereblink-cache
+          key: ui-tests-site-cache-v1-${{ github.run_id }}-${{ github.run_attempt }}
