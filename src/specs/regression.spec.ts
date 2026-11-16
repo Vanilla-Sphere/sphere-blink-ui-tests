@@ -79,7 +79,7 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
       }
     };
 
-    const gif = await fetchOrTimeout(gifHref.toString(), 240_000);
+    const gif = await fetchOrTimeout(gifHref.toString(), 120_000);
     if (gif && gif.status() === 200) {
       expect(gif.headers()["content-type"] ?? "").toMatch(/image\/gif/);
       const body = await gif.body();
@@ -90,7 +90,7 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
       test.info().annotations.push({ type: "state", description: `GIF HTTP ${gif ? gif.status() : "timeout"} at run time` });
     }
 
-    const png = await fetchOrTimeout("https://vanillasphere.com/api/frame.png?target=barnard&fov=8&det=rgb&group=day&i=0", 240_000);
+    const png = await fetchOrTimeout("https://vanillasphere.com/api/frame.png?target=barnard&fov=8&det=rgb&group=day&i=0", 120_000);
     if (png && png.status() === 200) {
       expect(png.headers()["content-type"] ?? "").toMatch(/image\/png/);
       const body = await png.body();
@@ -100,7 +100,7 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
       test.info().annotations.push({ type: "state", description: `PNG HTTP ${png ? png.status() : "timeout"} at run time` });
     }
 
-    const data = await fetchOrTimeout(apiHref.toString(), 240_000);
+    const data = await fetchOrTimeout(apiHref.toString(), 120_000);
     if (data && data.status() === 200) {
       expect(data.headers()["content-type"] ?? "").toMatch(/json/);
       const payload = await data.json();
