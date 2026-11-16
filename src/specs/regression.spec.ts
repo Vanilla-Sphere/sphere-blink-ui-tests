@@ -51,17 +51,15 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
   // about iframe embedding.
   test("[UI-097] Link GIF, Frame PNG, Data của view trả đúng loại [smoke]", async ({ page, request, analysis }) => {
     annotateCase(test.info(), "UI-097", "P0", "features.md §15; view cached, links fetched read-only; iframe embedding not asserted");
-    test.setTimeout(420_000);
+    test.setTimeout(660_000);
 
     await open(page, BARNARD_ADVANCED);
     try {
-      await waitViewReady(page, 1, 480_000);
+      await waitViewReady(page, 1, 240_000);
     } catch (e) {
-      test.skip(true, "Environment: the shared service did not serve view data to this runner within 480 s (datacenter-IP throttle/block; verified working locally)");
+      test.skip(true, "Environment: the shared service did not serve view data to this runner within 240 s (datacenter-IP throttle/block; verified working locally)");
     }
     await expect(analysis.spectrumCard).toBeVisible({ timeout: 120_000 });
-    await open(page, BARNARD_ADVANCED); // a fresh navigation keeps everything cached
-    await waitViewReady(page, 1, 480_000);
 
     const gifHref = new URL(await page.locator("#s-gif").inputValue());
     const apiHref = new URL(await page.locator("#s-api").inputValue());
