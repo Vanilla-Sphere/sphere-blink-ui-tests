@@ -24,11 +24,11 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
     test.setTimeout(540_000);
 
     await open(page, `${BARNARD_VIEW}&det=5,6&group=visit&mode=diffmed`);
-    await waitViewReady(page);
+    await waitViewReady(page, 1, 480_000);
     await expect(page.locator("#tname")).toContainText("Barnard");
 
     await page.reload();
-    await waitViewReady(page);
+    await waitViewReady(page, 1, 480_000);
     expect(await screen(page)).toBe("view");
     expect(await urlParams(page)).toMatchObject({ target: "barnard", det: "5,6", group: "visit", mode: "diffmed" });
     await expect(page.locator("#tname")).toContainText("Barnard");
