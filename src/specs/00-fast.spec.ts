@@ -1,5 +1,5 @@
 import { expect, test } from "../fixtures.js";
-import { computedStyle, open, screen, uiMode } from "../helpers/app.js";
+import { computedStyle, open, openLanding, screen, uiMode } from "../helpers/app.js";
 import { annotateCase } from "../helpers/case.js";
 
 /* Instant checks: everything that never loads a view or cuts data on the
@@ -13,24 +13,32 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   });
 
 
-  // UI-001 · P0 · features.md §1,3 (delta 0d8474f)
-  // Precondition: fresh session without vs.ui. Expected: the map opens centred
-  // near the galactic centre (starmap.js OPEN view, RA 266.4 Dec -29 — asserted
-  // as "the map is drawn", not pixel-checked), the six feature cards are listed
-  // with their destinations, the suggested targets are there, Simple is selected.
-  // "Whole sky" returning to the full sky is UI-002.
-  test("[UI-001] Trang chủ lần đầu @p0", async ({ page, mapScreen }) => {
-    annotateCase(test.info(), "UI-001", "P0", "features.md §1,3; delta 0d8474f: start near the galactic centre, six feature cards, Whole sky resets");
+  // UI-001 · P0 · features.md §1,3 (delta 55d1d0e)
+  // Precondition: fresh session. Expected: "/" is the introduction landing —
+  // hero, section navigation, team — and "Open the sky map" leads to the
+  // viewer at /sky, where the whole-sky map with its controls is shown.
+  test("[UI-001] Landing lần đầu và mở bản đồ trời", async ({ page, mapScreen }) => {
+    annotateCase(test.info(), "UI-001", "P0", "delta 55d1d0e: / is the landing, viewer at /sky; landing asserted, map via Open the sky map");
 
-    await open(page, "/");
+    await openLanding(page);
 
+    // The landing presents itself: hero, section navigation, sky link, footer.
+    await expect(page.locator("section.hero")).toBeVisible();
+    if (await page.locator('nav.navlinks a[href="#film"]').isVisible()) {
+      await expect(page.locator('nav.navlinks a[href="#film"]')).toBeInViewport();
+    }
+    await expect(page.locator("header.nav a[href=\"/sky\"]")).toBeVisible();
+    await expect(page.locator("footer.foot")).toBeVisible();
+
+    // "Open the sky map" leads to the viewer.
+    await page.locator("header.nav a[href=\"/sky\"]").click();
+    await page.waitForURL("**/sky");
+    await expect(page.locator("#map")).toBeVisible();
+
+    // On the viewer: Simple default, suggested targets, drawn whole-sky map.
     expect(await uiMode(page)).toBe("simple");
     expect(await screen(page)).toBe("map");
-    await expect(page).toHaveTitle(/Vanilla Sphere/);
     await expect(mapScreen.featuredTargets).toHaveCount(5);
-    await expect(mapScreen.doCards).toHaveCount(6);
-    await expect(page.locator("#dolist .do .nm").first()).not.toBeEmpty();
-    await expect(page.locator("#atlasnote")).toBeVisible();
     expect(await mapScreen.settledChecksum()).toBeGreaterThan(10_000);
   });
 
@@ -43,7 +51,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-002] Phóng, thu và về toàn thiên", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-002", "P1", "features.md §1; zoom-about-pointer leaves the centre slightly off, no exact-return assertion");
 
-    await open(page, "/");
+    await open(page, "/sky");
     const whole = await mapScreen.settledChecksum();
 
     await mapScreen.zoomIn.click();
@@ -71,7 +79,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-039] Trang đầu: tâm Ngân Hà, Whole sky, sáu thẻ @p0", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-039", "P0", "features.md §1; galactic-centre start documented in starmap.js OPEN view, not pixel-asserted");
 
-    await open(page, "/");
+    await open(page, "/sky");
     expect(await uiMode(page)).toBe("simple");
     await expect(mapScreen.doCards).toHaveCount(6);
     expect(await mapScreen.settledChecksum()).toBeGreaterThan(10_000);
@@ -91,7 +99,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-041] Thẻ mở Discoveries, Redshift, About the data", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-041", "P1", "features.md §1; live list read-only, no vote or heavy search");
 
-    await open(page, "/");
+    await open(page, "/sky");
 
     // On the phone viewport the card row scrolls horizontally, so each card is
     // brought into view first — what a visitor does with a swipe.
@@ -130,7 +138,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-042] Thẻ mờ khi zoom, ẩn full screen, hàng cuộn ngang", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-042", "P1", "features.md §1, viewer.md §Responsive; zoom-fade leg = build-dependent (live v54 fades on move, not on zoom), partial");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await expect(mapScreen.doCards.first()).toBeVisible();
 
     // Zoom-fade leg: the pinned commit 0d8474f fades the cards once the map is
@@ -170,7 +178,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-044] Ảnh nền 2MASS và bản đồ vẫn dùng được khi atlas lỗi [mock]", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-044", "P1", "features.md §1; atlas outage simulated by client-side route abort [mock]");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await mapScreen.zoomIn.click();
     await expect(page.locator("#atlasnote")).toBeVisible();
     const backdrop = await page.evaluate(() => {
@@ -205,7 +213,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-034] Focus và tooltip", async ({ page }) => {
     annotateCase(test.info(), "UI-034", "P1", "viewer.md §Accessibility");
 
-    await open(page, "/");
+    await open(page, "/sky");
 
     await page.keyboard.press("Tab");
     // The note is meant to appear on keyboard focus; the generous window only
@@ -251,7 +259,7 @@ test.describe("Instant checks, no data fetch (manual cases UI-001 .. UI-045)", (
   test("[UI-035] Reduced motion và screen reader", async ({ page }) => {
     annotateCase(test.info(), "UI-035", "P1", "viewer.md §Accessibility; screen-reader pass not automated");
 
-    await open(page, "/");
+    await open(page, "/sky");
     expect(await computedStyle(page, "#play", "transition-duration")).not.toBe("0s");
 
     await page.emulateMedia({ reducedMotion: "reduce" });

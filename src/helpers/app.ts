@@ -29,6 +29,26 @@ export async function open(page: Page, path: string): Promise<void> {
   throw new Error(`could not load ${path}: ${String(lastError)}`);
 }
 
+/**
+ * Opens the landing at "/" — it deliberately has no app shell (#q), so the
+ * open() shell-check loop does not apply; retry only for error pages.
+ */
+export async function openLanding(page: Page, path = "/"): Promise<void> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      await page.goto(path, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      const landing = await page.evaluate(() => document.querySelector("section.hero") !== null);
+      if (landing) return;
+      lastError = new Error("no hero section (error page served)");
+    } catch (e) {
+      lastError = e;
+    }
+    await page.waitForTimeout(15_000);
+  }
+  throw new Error(`could not load the landing ${path}: ${String(lastError)}`);
+}
+
 /** Interface mode of the viewer: attribute on <html>. */
 export async function uiMode(page: Page): Promise<string> {
   return page.evaluate(() => document.documentElement.dataset.ui ?? "");

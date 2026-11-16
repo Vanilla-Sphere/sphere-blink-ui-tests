@@ -92,5 +92,28 @@ carries the case ID; the report annotations carry priority and trace.
 | UI-084 | Danh sách theo target mới | P0 | `src/specs/api-list.spec.ts` (desktop: passed, smartphone: passed) |
 | UI-085 | Simple ẩn danh sách | P1 | `src/specs/api-list.spec.ts` (desktop: passed, smartphone: passed) |
 | UI-086 | Bàn phím với danh sách | P1 | `src/specs/api-list.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-098 | Landing hiển thị, Open the sky map | P0 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-099 | Deep link /? chuyển /sky giữ tham số | P0 | `src/specs/legacy-urls.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-100 | Redirect giữ ra/dec/levels/mover/seen | P1 | `src/specs/legacy-urls.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-101 | Section navigation | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-102 | Thẻ mở đúng view | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-103 | Open the log ở Advanced | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-104 | Finder blink Visit 1-6 Pause/Play | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-105 | Cuộn landing + imagery + credit | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-106 | Team và Contact | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-107 | Landing responsive + keyboard | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-108 | Link landing: href + tab mới | P1 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-109 | Blind search đang chạy + stack | P0 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-110 | Row lý do stack | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-111 | TNO/slow phân loại | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-112 | Ghép blind/stack | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-113 | Stack lỗi/chưa sẵn sàng | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-114 | Completeness blind/stack | P1 | `**not implemented**` |
+| UI-115 | Lỗi archive giữa lúc nạp | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-116 | Progressive field stage rộng thất bại | P0 | `**not implemented**` |
+| UI-117 | Retry cube 'at most twice' | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-118 | Over time theo band/tổng | P1 | `**not implemented**` (desktop: skipped, smartphone: skipped) |
+| UI-119 | Link /sky round trip | P1 | `src/specs/legacy-urls.spec.ts` (desktop: passed, smartphone: passed) |
+| UI-120 | Responsive + phím + popup | P2 | `src/specs/landing.spec.ts` (desktop: passed, smartphone: passed) |
 
-Run outcomes across both projects: {"passed":158,"skipped":30}
+Run outcomes across both projects: {"passed":184,"skipped":46}

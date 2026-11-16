@@ -59,11 +59,11 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
     annotateCase(test.info(), "UI-003", "P0", "features.md §1");
     test.setTimeout(180_000);
 
-    await open(page, "/");
+    await open(page, "/sky");
     // The worker's browser state may carry settings from an earlier phase;
     // this case needs a first-visit session.
     await page.evaluate(() => localStorage.clear());
-    await open(page, "/");
+    await open(page, "/sky");
     const mapBefore = await mapScreen.settledChecksum();
 
     await mapScreen.clickAt(0.5, 0.45);
@@ -87,7 +87,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
     annotateCase(test.info(), "UI-004", "P1", "viewer.md §Sky map");
     test.setTimeout(180_000);
 
-    await open(page, "/");
+    await open(page, "/sky");
     const whole = await mapScreen.settledChecksum();
 
     await mapScreen.canvas.focus();
@@ -114,7 +114,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   test("[UI-005] Mở mục tiêu gợi ý @p0", async ({ page, mapScreen, viewStage }) => {
     annotateCase(test.info(), "UI-005", "P0", "features.md §2,16");
 
-    await open(page, "/");
+    await open(page, "/sky");
     // The target list is built from /api/featured, which can be slow when the
     // shared service is busy.
     await expect(mapScreen.featuredTargets).toHaveCount(5, { timeout: 60_000 });
@@ -133,7 +133,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   test("[UI-006] Tìm tên hợp lệ @p0", async ({ page, topBar, viewStage }) => {
     annotateCase(test.info(), "UI-006", "P0", "features.md §2");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await topBar.search("barnard");
     await waitViewReady(page);
 
@@ -336,7 +336,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   test("[UI-015] Ưu tiên mode trong URL", async ({ page }) => {
     annotateCase(test.info(), "UI-015", "P1", "viewer.md §URL state");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await page.evaluate(() => localStorage.setItem("vs.ui", "adv"));
 
     await open(page, "/?ui=simple&target=barnard");
@@ -1021,7 +1021,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   test("[UI-062] Ngưỡng redshift: Off/All/z>0.1..7", async ({ page, mapScreen }) => {
     annotateCase(test.info(), "UI-062", "P1", "features.md §18; panel state and counts asserted, map layer pixels = [C]");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await mapScreen.redshiftOpen.click();
     await expect(mapScreen.redshiftPanel).toBeVisible();
 
@@ -1391,7 +1391,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
     annotateCase(test.info(), "UI-040", "P1", "features.md §1");
     test.setTimeout(300_000);
 
-    await open(page, "/");
+    await open(page, "/sky");
 
     await mapScreen.doCard("blink").click();
     await waitViewScreen(page);
@@ -1423,12 +1423,12 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
     annotateCase(test.info(), "UI-045", "P1", "features.md §1; ambient effects are transform/opacity-only by design, motion diff audit = manual [C]");
 
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await open(page, "/");
+    await open(page, "/sky");
 
     const reduced = await page.evaluate(() => getComputedStyle(document.getElementById("play")!).transitionDuration);
     expect(reduced).toBe("0s");
 
-    await open(page, "/");
+    await open(page, "/sky");
     await page.locator("#map").focus();
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowRight");
@@ -1531,7 +1531,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
   test("[UI-074] Biên 480/760 cho thẻ và controls mới", async ({ page }) => {
     annotateCase(test.info(), "UI-074", "P1", "viewer.md §Responsive; build v54 note: touch height is pointer:coarse-driven, 200% zoom and the a11y standard = [C]");
 
-    await open(page, "/");
+    await open(page, "/sky");
     for (const width of [479, 480, 481]) {
       await page.setViewportSize({ width, height: 800 });
       await page.waitForTimeout(150);
@@ -1678,7 +1678,7 @@ test.describe("Journey: one flow through every feature (manual cases UI-003 .. U
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ movers: sorted, total: sorted.length }) }),
     );
 
-    await open(page, "/");
+    await open(page, "/sky");
     await page.locator('#dolist .do[data-do="movers"]').click();
     const sheet = page.locator("#discoveries");
     await expect(sheet).toBeVisible();
