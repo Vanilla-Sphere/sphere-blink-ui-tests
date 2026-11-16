@@ -126,7 +126,7 @@ export async function framePosition(page: Page): Promise<FramePosition> {
  * Waits until the viewer has at least `minFrames` frames of the current view.
  * The server cuts images on demand, so the first load can take a while.
  */
-export async function waitViewReady(page: Page, minFrames = 1, timeout = 120_000): Promise<void> {
+export async function waitViewReady(page: Page, minFrames = 1, timeout = 240_000): Promise<void> {
   await page.waitForFunction(
     (min) => {
       const count = document.getElementById("count")?.textContent ?? "";

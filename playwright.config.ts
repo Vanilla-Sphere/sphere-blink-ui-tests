@@ -9,8 +9,9 @@ export default defineConfig({
      most two view loads touch the shared service at once. The app waits out
      HTTP 429 with the server's Retry-After before it shows an error. */
   workers: 4,
-  /* First loads of a view can take a while: the server cuts the images on demand. */
-  timeout: 120_000,
+  /* First loads of a view can take minutes: the server cuts the images on
+     demand, and a freshly started service (as in CI) also builds its cache. */
+  timeout: 300_000,
   expect: { timeout: 15_000 },
   /* No retries: a failure is reported as it happened, per the project's honest-reporting rule. */
   retries: 0,
