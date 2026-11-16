@@ -34,15 +34,20 @@ test.describe("Legacy URLs and /sky round trip (manual cases UI-099, UI-100, UI-
     // Guard: a levels=3 field would start a heavy progressive job on the
     // shared service — the redirect is what this case asserts, so the tile
     // and cube requests are answered with empty contracts instead ([mock]).
-    await page.route("**/api/tiles?*", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ stages: [], tiles: [] }) }));
-    await page.route("**/api/cube?*", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) }));
+    // The catch-all logger is registered FIRST: later registrations win, so
+    // the specific guards below it always take precedence.
     await page.route("**/*", (route) => {
       const url = new URL(route.request().url());
       if (url.pathname === "/" || url.pathname === "/sky") events.push(url.pathname + url.search);
       return route.continue();
     });
+    await page.route("**/api/tiles?*", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ stages: [], tiles: [] }) }));
+    await page.route("**/api/cube?*", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({}) }));
 
     await open(page, "/?ra=248.34&dec=-16.98&levels=3&mover=VS-60894-B5F6&seen=61021.4&ui=adv");
+    // The redirect is client-side on the landing load; the params in the
+    // address are the contract. The view's own loading is intentionally not
+    // awaited here (levels=3 would be heavy on the shared service).
     await page.waitForURL("**/sky**", { timeout: 60_000 });
 
     expect(new URL(page.url()).pathname).toBe("/sky");
