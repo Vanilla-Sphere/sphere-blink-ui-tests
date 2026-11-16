@@ -3,25 +3,26 @@
 The suite runs on GitHub Actions in two places, through one action
 (`action.yml` at the root of this repository).
 
-| Where | When | Site under test |
+**Rule of the team (2026-11-16): the suite never runs against production or
+any site hosted on Render.** Both places below start the service of
+sphere-blink inside the GitHub job and make every name of the deployed sites
+(`vanillasphere.com`, `www.` and `dev.vanillasphere.com`, the two
+`onrender.com` names) resolve to that job's machine, so a test that names a
+deployed site reaches that server or fails.
+
+| Where | When | Service under test |
 | --- | --- | --- |
-| This repository, `.github/workflows/ui-tests.yml` | Every push to `main`, every pull request, or by hand (Actions > ui-tests > Run workflow) | Production, or the one chosen by hand |
-| `Vanilla-Sphere/sphere-blink`, `.github/workflows/ui-tests.yml` | After every merge to `develop` | <https://dev.vanillasphere.com> |
-| | After every merge to `main` | <https://vanillasphere.com> |
+| This repository, `.github/workflows/ui-tests.yml` | Every push to `main`, every pull request, or by hand | sphere-blink `develop` (or the branch chosen by hand), started in the job |
+| `Vanilla-Sphere/sphere-blink`, `.github/workflows/ui-tests.yml` | Every pull request to `develop` or `main`, before the merge | The commit of the pull request, started in the job |
 
-In sphere-blink the run waits until the site serves the merged commit, then
-calls this repository:
+Nothing runs after a deploy. The result is a check on the pull request. The
+tests, their configuration and the way they are run stay here, so a change
+to a test needs no change in sphere-blink.
 
-```yaml
-- uses: Vanilla-Sphere/sphere-blink-ui-tests@main
-  with:
-    base-url: https://dev.vanillasphere.com/
-```
-
-The result is a check on the sphere-blink commit. The tests, their
-configuration and the way they are run stay here, so a change to a test needs
-no change in sphere-blink: the next merge there runs whatever is on `main`
-here.
+Running the suite on your own computer: start the service there
+(`sh scripts/start_local_site.sh` in a sphere-blink checkout) and set
+`BASE_URL=http://127.0.0.1:8000/`. Never run it with `BASE_URL` left out or
+set to a deployed site.
 
 ## What a run does
 
