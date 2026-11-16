@@ -19,6 +19,9 @@ test.describe("Regression after the frame change (manual cases UI-096, UI-097)",
   // asserted.
   test("[UI-096] Mở và reload trang giữ nguyên view", async ({ page }) => {
     annotateCase(test.info(), "UI-096", "P0", "features.md §15, viewer; iframe-change regression smoke, page + reload only");
+    // The throttled datacenter-IP budget: view loads from the shared service
+    // take minutes on CI while they take seconds locally.
+    test.setTimeout(540_000);
 
     await open(page, `${BARNARD_VIEW}&det=5,6&group=visit&mode=diffmed`);
     await waitViewReady(page);
